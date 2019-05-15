@@ -2,10 +2,11 @@ package com.travelassistant.service.impl;
 
 import com.travelassistant.common.Const;
 import com.travelassistant.common.ServerResponse;
-import com.travelassistant.common.TokenCache;
 import com.travelassistant.dao.UserMapper;
 import com.travelassistant.pojo.User;
+import com.travelassistant.common.UserWithToken;
 import com.travelassistant.service.IUserService;
+import com.travelassistant.util.GuidUtil;
 import com.travelassistant.util.MD5Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,7 @@ public class UserServiceImpl implements IUserService {
     private UserMapper userMapper;
 
     @Override
-    public ServerResponse<User> login(String phone, String password) {
+    public ServerResponse<UserWithToken> login(String phone, String password) {
         int resultCount = userMapper.checkPhone(phone);
         if(resultCount == 0 ){
             return ServerResponse.createByErrorMsg("手机号尚未注册");
@@ -31,7 +32,10 @@ public class UserServiceImpl implements IUserService {
         }
 
         user.setPassword(org.apache.commons.lang3.StringUtils.EMPTY);
-        return ServerResponse.createBySuccess("登录成功",user);
+        String token = GuidUtil.GenerateGUID();
+        UserWithToken userWithToken = new UserWithToken(user.getId(),user.getPhone(),user.getUsername(),user.getPassword(),user.getCreateTime(),
+                user.getUpdateTime(),token);
+        return ServerResponse.createBySuccess("登录成功",userWithToken);
     }
 
     public ServerResponse<String> register(User user){
@@ -128,6 +132,7 @@ public class UserServiceImpl implements IUserService {
         User updateUser = new User();
         updateUser.setId(user.getId());
         updateUser.setUsername(user.getUsername());
+        updateUser.setUpdateTime(user.getUpdateTime());
 
         int updateCount = userMapper.updateByPrimaryKeySelective(updateUser);
         if(updateCount > 0){

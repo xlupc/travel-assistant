@@ -4,6 +4,7 @@ import com.travelassistant.common.Const;
 import com.travelassistant.common.ResponseCode;
 import com.travelassistant.common.ServerResponse;
 import com.travelassistant.pojo.User;
+import com.travelassistant.common.UserWithToken;
 import com.travelassistant.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -29,18 +30,42 @@ public class UserController {
      */
     @RequestMapping(value = "login.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<User> login(String phone, String password, HttpSession session) {
+    public ServerResponse<UserWithToken> login(String phone, String password, HttpSession session) {
 //        service -> myBatis -> dao
-        ServerResponse<User> response = iUserService.login(phone,password);
+        ServerResponse<UserWithToken> response = iUserService.login(phone,password);
         if(response.isSuccess()){
             session.setAttribute(Const.CURRENT_USER,response.getData());
+            System.out.println(session.getAttribute(Const.CURRENT_USER));
         }
         return response;
+    }
+
+    @RequestMapping(value = "login_with_token.do",method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<UserWithToken> loginWithToken(String token, HttpSession session){
+        UserWithToken user = (UserWithToken)session.getAttribute(Const.CURRENT_USER);
+        if(user == null){
+            return ServerResponse.createByErrorMsg("token用户未登录");
+        }
+        String sessionToken = user.getToken();
+        System.out.println(sessionToken);
+        System.out.println(token);
+        System.out.println(org.apache.commons.lang3.StringUtils.equals(sessionToken,token));
+        if(org.apache.commons.lang3.StringUtils.equals(sessionToken,token)) {
+            return ServerResponse.createBySuccess("登录成功",user);
+        }
+        return ServerResponse.createByErrorMsg("登录失败");
     }
 
     @RequestMapping(value = "logout.do",method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<String> logout(HttpSession session){
+        UserWithToken currentUser = (UserWithToken)session.getAttribute(Const.CURRENT_USER);
+        System.out.println(session.getAttribute(Const.CURRENT_USER));
+        System.out.println(currentUser);
+        if(currentUser == null){
+            return ServerResponse.createByErrorMsg("用户未登录");
+        }
         session.removeAttribute(Const.CURRENT_USER);
         return ServerResponse.createBySuccessMsg("注销成功");
     }
@@ -59,8 +84,8 @@ public class UserController {
 
     @RequestMapping(value = "get_user_info.do",method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<User> getUserInfo(HttpSession session){
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse<UserWithToken> getUserInfo(HttpSession session){
+        UserWithToken user = (UserWithToken) session.getAttribute(Const.CURRENT_USER);
         if(user != null){
             return ServerResponse.createBySuccess(user);
         }
@@ -76,17 +101,21 @@ public class UserController {
     @RequestMapping(value = "reset_password.do",method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<String> resetPassword(HttpSession session,String passwordOld,String passwordNew){
-        User user = (User)session.getAttribute(Const.CURRENT_USER);
+        UserWithToken user = (UserWithToken)session.getAttribute(Const.CURRENT_USER);
         if(user == null){
             return ServerResponse.createByErrorMsg("用户未登录");
         }
-        return iUserService.resetPassword(passwordOld,passwordNew,user);
+        User user1 = new User(user.getId(),user.getPhone(),user.getUsername(),user.getPassword(),user.getCreateTime(),
+                user.getUpdateTime());
+        return iUserService.resetPassword(passwordOld,passwordNew,user1);
     }
 
     @RequestMapping(value = "update_information.do",method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<User> update_information(HttpSession session,User user){
-        User currentUser = (User)session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse<User> update_information(User user,HttpSession session){
+        UserWithToken currentUser = (UserWithToken)session.getAttribute(Const.CURRENT_USER);
+        System.out.println(session.getAttribute(Const.CURRENT_USER));
+        System.out.println(currentUser);
         if(currentUser == null){
             return ServerResponse.createByErrorMsg("用户未登录");
         }
@@ -96,7 +125,10 @@ public class UserController {
         ServerResponse<User> response = iUserService.updateInformation(user);
         if(response.isSuccess()){
             response.getData().setPhone(currentUser.getPhone());
-            session.setAttribute(Const.CURRENT_USER,response.getData());
+            UserWithToken userWithToken = new UserWithToken(response.getData().getId(),response.getData().getPhone(),response.getData().getUsername(),
+                    response.getData().getPassword(),response.getData().getCreateTime(),
+                    response.getData().getUpdateTime(),currentUser.getToken());
+            session.setAttribute(Const.CURRENT_USER,userWithToken);
         }
         return response;
     }
@@ -104,7 +136,7 @@ public class UserController {
     @RequestMapping(value = "get_information.do",method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<User> get_information(HttpSession session){
-        User currentUser = (User)session.getAttribute(Const.CURRENT_USER);
+        UserWithToken currentUser = (UserWithToken)session.getAttribute(Const.CURRENT_USER);
         if(currentUser == null){
             return ServerResponse.createByErrorCodeMsg(ResponseCode.NEED_LOGIN.getCode(),"未登录,需要强制登录");
         }

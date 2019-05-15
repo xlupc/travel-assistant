@@ -2,9 +2,10 @@ package com.travelassistant.service;
 
 import com.travelassistant.common.ServerResponse;
 import com.travelassistant.pojo.User;
+import com.travelassistant.common.UserWithToken;
 
 public interface IUserService {
-    ServerResponse<User> login(String username, String password);
+    ServerResponse<UserWithToken> login(String username, String password);
 
     ServerResponse<String> register(User user);
 
