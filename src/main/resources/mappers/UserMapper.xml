@@ -15,7 +15,7 @@
     id, phone, username, password, create_time, update_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
-    select 
+    select
     <include refid="Base_Column_List" />
     from user
     where id = #{id,jdbcType=INTEGER}
@@ -25,12 +25,12 @@
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.travelassistant.pojo.User" >
-    insert into user (id, phone, username, 
-      password, create_time, update_time
-      )
-    values (#{id,jdbcType=INTEGER}, #{phone,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR}, 
-      #{password,jdbcType=VARCHAR}, now(), now()
-      )
+    insert into user (id, phone, username,
+    password, create_time, update_time
+    )
+    values (#{id,jdbcType=INTEGER}, #{phone,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR},
+    #{password,jdbcType=VARCHAR}, now(), now()
+    )
   </insert>
   <insert id="insertSelective" parameterType="com.travelassistant.pojo.User" >
     insert into user
@@ -90,7 +90,7 @@
       <if test="createTime != null" >
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateTime != null" >
+      <if test="updateTime == null" >
         update_time = now(),
       </if>
     </set>
@@ -99,10 +99,10 @@
   <update id="updateByPrimaryKey" parameterType="com.travelassistant.pojo.User" >
     update user
     set phone = #{phone,jdbcType=VARCHAR},
-      username = #{username,jdbcType=VARCHAR},
-      password = #{password,jdbcType=VARCHAR},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = now()
+    username = #{username,jdbcType=VARCHAR},
+    password = #{password,jdbcType=VARCHAR},
+    create_time = create_time,
+    update_time = now()
     where id = #{id,jdbcType=INTEGER}
   </update>
 
@@ -111,10 +111,10 @@
     where username = #{username}
   </select>
 
-    <select id="checkPhone" resultType="int" parameterType="string" >
-        select count(1) from user
-        where phone = #{phone}
-    </select>
+  <select id="checkPhone" resultType="int" parameterType="string" >
+    select count(1) from user
+    where phone = #{phone}
+  </select>
 
   <select id="selectUser" resultMap="BaseResultMap" parameterType="map">
     SELECT
@@ -124,18 +124,18 @@
     and password = #{password}
   </select>
 
-    <update id="updatePasswordByPhone" parameterType="map">
-        update user
-        SET password = #{passwordNew},update_time = now()
-        where phone = #{phone}
-    </update>
+  <update id="updatePasswordByPhone" parameterType="map">
+    update user
+    SET password = #{passwordNew},update_time = now(),create_time = create_time
+    where phone = #{phone}
+  </update>
 
-    <select id="checkPassword" resultType="int" parameterType="map">
-        SELECT
-        count(1)
-        from user
-        where password = #{password}
-        and id = #{userId}
-    </select>
+  <select id="checkPassword" resultType="int" parameterType="map">
+    SELECT
+    count(1)
+    from user
+    where password = #{password}
+    and id = #{userId}
+  </select>
 
 </mapper>

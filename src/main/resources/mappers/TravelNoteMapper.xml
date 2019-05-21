@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.travelassistant.dao.TravelNoteMapper" >
+  <resultMap id="BaseResultMap" type="com.travelassistant.pojo.TravelNote" >
+    <constructor >
+      <idArg column="id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="user_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="note_title" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="note_body" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="location" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="browse_times" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="create_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+      <arg column="update_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+    </constructor>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, user_id, note_title, note_body, location, browse_times, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from travel_note
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from travel_note
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.travelassistant.pojo.TravelNote" >
+    insert into travel_note (id, user_id, note_title, 
+      note_body, location, browse_times, 
+      create_time, update_time)
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{noteTitle,jdbcType=VARCHAR}, 
+      #{noteBody,jdbcType=VARCHAR}, #{location,jdbcType=VARCHAR}, #{browseTimes,jdbcType=INTEGER},
+    now(), now())
+  </insert>
+  <insert id="insertSelective" parameterType="com.travelassistant.pojo.TravelNote" >
+    insert into travel_note
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="noteTitle != null" >
+        note_title,
+      </if>
+      <if test="noteBody != null" >
+        note_body,
+      </if>
+      <if test="location != null" >
+        location,
+      </if>
+      <if test="browseTimes != null" >
+        browse_times,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="noteTitle != null" >
+        #{noteTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="noteBody != null" >
+        #{noteBody,jdbcType=VARCHAR},
+      </if>
+      <if test="location != null" >
+        #{location,jdbcType=VARCHAR},
+      </if>
+      <if test="browseTimes != null" >
+        #{browseTimes,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        now(),
+      </if>
+      <if test="updateTime != null" >
+        now(),
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.travelassistant.pojo.TravelNote" >
+    update travel_note
+    <set >
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="noteTitle != null" >
+        note_title = #{noteTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="noteBody != null" >
+        note_body = #{noteBody,jdbcType=VARCHAR},
+      </if>
+      <if test="location != null" >
+        location = #{location,jdbcType=VARCHAR},
+      </if>
+      <if test="browseTimes != null" >
+        browse_times = #{browseTimes,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = now(),
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.travelassistant.pojo.TravelNote" >
+    update travel_note
+    set user_id = #{userId,jdbcType=INTEGER},
+      note_title = #{noteTitle,jdbcType=VARCHAR},
+      note_body = #{noteBody,jdbcType=VARCHAR},
+      location = #{location,jdbcType=VARCHAR},
+      browse_times = #{browseTimes,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = now()
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="checkTravelNote" resultType="int" parameterType="map" >
+    select count(1) from travel_note
+    where user_id = #{userId}
+    and note_title = #{noteTitle}
+    and note_body = #{noteBody}
+  </select>
+
+  <select id="selectTravelNote" resultMap="BaseResultMap" parameterType="map">
+    SELECT
+    <include refid="Base_Column_List" />
+    from travel_note
+    where user_id = #{userId}
+    and note_title = #{noteTitle}
+    and note_body = #{noteBody}
+  </select>
+
+  <select id="selectTravelNoteByUserId" resultMap="BaseResultMap" parameterType="map">
+    SELECT
+    <include refid="Base_Column_List" />
+    from travel_note
+    where user_id = #{userId}
+  </select>
+
+  <select id="selectAllTravelNote" resultMap="BaseResultMap" parameterType="map">
+    SELECT
+    <include refid="Base_Column_List" />
+    from travel_note
+  </select>
+
+  <update id="increaseBrowseTimes" parameterType="Integer">
+    update travel_note
+    SET browse_times = browse_times+1,update_time = now(),create_time = create_time
+    where id = #{noteId}
+  </update>
+
+</mapper>

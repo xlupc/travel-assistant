@@ -2,7 +2,10 @@ package com.travelassistant.service.impl;
 
 import com.travelassistant.common.Const;
 import com.travelassistant.common.ServerResponse;
+import com.travelassistant.dao.BrowsingHistoryMapper;
+import com.travelassistant.dao.CommentMapper;
 import com.travelassistant.dao.UserMapper;
+import com.travelassistant.pojo.BrowsingHistory;
 import com.travelassistant.pojo.User;
 import com.travelassistant.common.UserWithToken;
 import com.travelassistant.service.IUserService;
@@ -11,11 +14,17 @@ import com.travelassistant.util.MD5Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service("iUserService")
 public class UserServiceImpl implements IUserService {
 
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private CommentMapper commentMapper;
+    @Autowired
+    private BrowsingHistoryMapper browsingHistoryMapper;
 
     @Override
     public ServerResponse<UserWithToken> login(String phone, String password) {
@@ -123,7 +132,7 @@ public class UserServiceImpl implements IUserService {
         return ServerResponse.createByErrorMsg("密码更新失败");
     }
 
-    public ServerResponse<User> updateInformation(User user){
+    public ServerResponse<User> updateInformation(User user, String oldName){
         //phone是不能被更新的
         int resultCount = userMapper.checkUsername(user.getUsername());
         if(resultCount > 0){
@@ -132,10 +141,11 @@ public class UserServiceImpl implements IUserService {
         User updateUser = new User();
         updateUser.setId(user.getId());
         updateUser.setUsername(user.getUsername());
-        updateUser.setUpdateTime(user.getUpdateTime());
+//        updateUser.setUpdateTime(user.getUpdateTime());
 
         int updateCount = userMapper.updateByPrimaryKeySelective(updateUser);
         if(updateCount > 0){
+            commentMapper.updateUsername(user.getUsername(), oldName);
             return ServerResponse.createBySuccess("更新个人信息成功",updateUser);
         }
         return ServerResponse.createByErrorMsg("更新个人信息失败");
@@ -149,5 +159,28 @@ public class UserServiceImpl implements IUserService {
         user.setPassword(org.apache.commons.lang3.StringUtils.EMPTY);
         return ServerResponse.createBySuccess(user);
 
+    }
+
+    public ServerResponse<String> insertBrowseRecord(BrowsingHistory browsingHistory){
+
+        int resultCount = browsingHistoryMapper.insert(browsingHistory);
+        if(resultCount == 0){
+            return ServerResponse.createByErrorMsg("添加浏览记录失败");
+        }
+        return ServerResponse.createBySuccessMsg("添加浏览记录成功");
+    }
+
+    public ServerResponse<List<BrowsingHistory>> selectBrowseRecord(Integer userId){
+        List<BrowsingHistory> list = browsingHistoryMapper.selectByUserId(userId);
+        return ServerResponse.createBySuccess("查找浏览记录成功", list);
+
+    }
+
+    public ServerResponse<String> deleteBrowseRecord(Integer userId){
+        int resultCount = browsingHistoryMapper.deleteByUserId(userId);
+        if(resultCount == 0){
+            return ServerResponse.createByErrorMsg("删除浏览记录失败");
+        }
+        return ServerResponse.createBySuccessMsg("删除浏览记录成功");
     }
 }

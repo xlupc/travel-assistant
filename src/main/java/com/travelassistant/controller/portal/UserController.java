@@ -3,6 +3,7 @@ package com.travelassistant.controller.portal;
 import com.travelassistant.common.Const;
 import com.travelassistant.common.ResponseCode;
 import com.travelassistant.common.ServerResponse;
+import com.travelassistant.pojo.BrowsingHistory;
 import com.travelassistant.pojo.User;
 import com.travelassistant.common.UserWithToken;
 import com.travelassistant.service.IUserService;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @Controller
 @RequestMapping("/user/")
@@ -122,7 +124,7 @@ public class UserController {
         // 防止越权
         user.setId(currentUser.getId());
         user.setPhone(currentUser.getPhone());
-        ServerResponse<User> response = iUserService.updateInformation(user);
+        ServerResponse<User> response = iUserService.updateInformation(user, currentUser.getUsername());
         if(response.isSuccess()){
             response.getData().setPhone(currentUser.getPhone());
             UserWithToken userWithToken = new UserWithToken(response.getData().getId(),response.getData().getPhone(),response.getData().getUsername(),
@@ -141,6 +143,32 @@ public class UserController {
             return ServerResponse.createByErrorCodeMsg(ResponseCode.NEED_LOGIN.getCode(),"未登录,需要强制登录");
         }
         return iUserService.getInformation(currentUser.getId());
+    }
+
+    @RequestMapping(value = "add_browse_record.do",method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> addBrowseRecord(BrowsingHistory browsingHistory){
+        return iUserService.insertBrowseRecord(browsingHistory);
+    }
+
+    @RequestMapping(value = "get_browse_record.do",method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<List<BrowsingHistory>> getBrowseRecord(HttpSession session){
+        UserWithToken currentUser = (UserWithToken)session.getAttribute(Const.CURRENT_USER);
+        if(currentUser == null){
+            return ServerResponse.createByErrorCodeMsg(ResponseCode.NEED_LOGIN.getCode(),"未登录");
+        }
+        return iUserService.selectBrowseRecord(currentUser.getId());
+    }
+
+    @RequestMapping(value = "delete_browse_record.do",method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> deleteBrowseRecord(HttpSession session){
+        UserWithToken currentUser = (UserWithToken)session.getAttribute(Const.CURRENT_USER);
+        if(currentUser == null){
+            return ServerResponse.createByErrorCodeMsg(ResponseCode.NEED_LOGIN.getCode(),"未登录");
+        }
+        return iUserService.deleteBrowseRecord(currentUser.getId());
     }
 
 }
