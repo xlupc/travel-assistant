@@ -20,4 +20,5 @@ public interface NoteImageMapper {
 
     List<NoteImage> selectNoteImageByNoteId(@Param("noteId") Integer noteId);
 
+    int deleteByNoteId(@Param("noteId")Integer noteId);
 }

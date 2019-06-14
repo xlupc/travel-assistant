@@ -148,6 +148,7 @@ public class TravelNoteController {
             ServerResponse<User> userServerResponse  = iUserService.getInformation(travelNote.getUserId());
             Map map = new HashMap();
             map.put("id",travelNote.getId());
+            map.put("userId",travelNote.getUserId());
             map.put("username",userServerResponse.getData().getUsername());
             map.put("noteTitle",travelNote.getNoteTitle());
             map.put("noteBody",travelNote.getNoteBody());
@@ -173,6 +174,7 @@ public class TravelNoteController {
             ServerResponse<User> userServerResponse  = iUserService.getInformation(travelNote.getUserId());
             Map map = new HashMap();
             map.put("id",travelNote.getId());
+            map.put("userId",travelNote.getUserId());
             map.put("username",userServerResponse.getData().getUsername());
             map.put("noteTitle",travelNote.getNoteTitle());
             map.put("noteBody",travelNote.getNoteBody());
@@ -231,12 +233,15 @@ public class TravelNoteController {
     @RequestMapping(value = "get_travel_note.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<Map> getTravelNote(int noteId) {
+        Map map = new HashMap();
         ServerResponse<TravelNote> travelNoteResponse =  iNoteService.getTravelNote(noteId);
+        if(travelNoteResponse.getData() == null) {
+            return ServerResponse.createBySuccess("游记不存在",map);
+        }
         TravelNote travelNote = travelNoteResponse.getData();
         ServerResponse<List<NoteImage>> noteImageResponse = iNoteService.getNoteImageByNoteId(travelNote.getId());
         ServerResponse<List<Comment>> commentResponse = iNoteService.getCommentByNoteId(travelNote.getId());
         ServerResponse<User> userServerResponse  = iUserService.getInformation(travelNote.getUserId());
-        Map map = new HashMap();
         map.put("id",travelNote.getId());
         map.put("username",userServerResponse.getData().getUsername());
         map.put("noteTitle",travelNote.getNoteTitle());
@@ -249,5 +254,55 @@ public class TravelNoteController {
         map.put("comments",commentResponse.getData());
 
         return ServerResponse.createBySuccess("获取游记信息成功",map);
+    }
+
+    @RequestMapping(value = "delete_note_comment.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> deleteNoteComment(int noteId, HttpSession session) {
+        UserWithToken currentUser = (UserWithToken)session.getAttribute(Const.CURRENT_USER);
+        if(currentUser == null){
+            return ServerResponse.createByErrorCodeMsg(ResponseCode.NEED_LOGIN.getCode(),"未登录，请登录后再次尝试");
+        }
+        return iNoteService.deleteNoteComment(noteId);
+    }
+
+    @RequestMapping(value = "delete_comment.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> deleteComment(int commentId, HttpSession session) {
+        UserWithToken currentUser = (UserWithToken)session.getAttribute(Const.CURRENT_USER);
+        if(currentUser == null){
+            return ServerResponse.createByErrorCodeMsg(ResponseCode.NEED_LOGIN.getCode(),"未登录，请登录后再次尝试");
+        }
+        return iNoteService.deleteComment(commentId);
+    }
+
+    @RequestMapping(value = "delete_note_image.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> deleteNoteImage(int noteId, HttpSession session) {
+        UserWithToken currentUser = (UserWithToken)session.getAttribute(Const.CURRENT_USER);
+        if(currentUser == null){
+            return ServerResponse.createByErrorCodeMsg(ResponseCode.NEED_LOGIN.getCode(),"未登录，请登录后再次尝试");
+        }
+        return iNoteService.deleteNoteImage(noteId);
+    }
+
+    @RequestMapping(value = "delete_image.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> deleteImage(int imageId, HttpSession session) {
+        UserWithToken currentUser = (UserWithToken)session.getAttribute(Const.CURRENT_USER);
+        if(currentUser == null){
+            return ServerResponse.createByErrorCodeMsg(ResponseCode.NEED_LOGIN.getCode(),"未登录，请登录后再次尝试");
+        }
+        return iNoteService.deleteImage(imageId);
+    }
+
+    @RequestMapping(value = "delete_travel_note.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<String> deleteTravelNote(int noteId, HttpSession session) {
+        UserWithToken currentUser = (UserWithToken)session.getAttribute(Const.CURRENT_USER);
+        if(currentUser == null){
+            return ServerResponse.createByErrorCodeMsg(ResponseCode.NEED_LOGIN.getCode(),"未登录，请登录后再次尝试");
+        }
+        return iNoteService.deleteTravelNote(noteId);
     }
 }

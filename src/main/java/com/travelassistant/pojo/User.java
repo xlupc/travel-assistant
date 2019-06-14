@@ -11,15 +11,18 @@ public class User {
 
     private String password;
 
+    private Integer role;
+
     private Date createTime;
 
     private Date updateTime;
 
-    public User(Integer id, String phone, String username, String password, Date createTime, Date updateTime) {
+    public User(Integer id, String phone, String username, String password, Integer role, Date createTime, Date updateTime) {
         this.id = id;
         this.phone = phone;
         this.username = username;
         this.password = password;
+        this.role = role;
         this.createTime = createTime;
         this.updateTime = updateTime;
     }
@@ -58,6 +61,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password == null ? null : password.trim();
+    }
+
+    public Integer getRole() {
+        return role;
+    }
+
+    public void setRole(Integer role) {
+        this.role = role;
     }
 
     public Date getCreateTime() {

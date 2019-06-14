@@ -11,23 +11,34 @@ public class UserWithToken {
 
     private String password;
 
+    private Integer role;
+
     private Date createTime;
 
     private Date updateTime;
 
     private String token;
 
-    public UserWithToken(Integer id, String phone, String username, String password, Date createTime, Date updateTime, String token) {
+    public UserWithToken(Integer id, String phone, String username, String password, Integer role, Date createTime, Date updateTime, String token) {
         this.id = id;
         this.phone = phone;
         this.username = username;
         this.password = password;
+        this.role = role;
         this.createTime = createTime;
         this.updateTime = updateTime;
         this.token = token;
     }
 
     public UserWithToken() {
+    }
+
+    public Integer getRole() {
+        return role;
+    }
+
+    public void setRole(Integer role) {
+        this.role = role;
     }
 
     public Integer getId() {

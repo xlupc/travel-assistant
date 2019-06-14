@@ -100,4 +100,9 @@
     where note_id = #{noteId}
   </select>
 
+  <delete id="deleteByNoteId" parameterType="java.lang.Integer" >
+    delete from note_image
+    where note_id = #{noteId}
+  </delete>
+
 </mapper>

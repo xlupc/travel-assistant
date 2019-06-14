@@ -136,4 +136,8 @@
     where username = #{oldName}
   </update>
 
+  <delete id="deleteByNoteId" parameterType="java.lang.Integer" >
+    delete from comment
+    where note_id = #{noteId}
+  </delete>
 </mapper>

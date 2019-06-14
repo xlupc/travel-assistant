@@ -42,9 +42,6 @@ public class NoteServiceImpl implements INoteService {
 
     public ServerResponse<TravelNote> getTravelNoteByAll(int userId, TravelNote travelNote) {
         TravelNote travelNote1 = travelNoteMapper.selectTravelNote(userId,travelNote.getNoteTitle(),travelNote.getNoteBody());
-        if(travelNote1 == null) {
-            return ServerResponse.createByErrorMsg("查找游记失败");
-        }
         return ServerResponse.createBySuccess("查找成功", travelNote1);
     }
 
@@ -55,11 +52,17 @@ public class NoteServiceImpl implements INoteService {
 
     public ServerResponse<List<NoteImage>> getNoteImageByNoteId(int noteId) {
         List<NoteImage> list = noteImageMapper.selectNoteImageByNoteId(noteId);
+        if(list == null) {
+            return ServerResponse.createByErrorMsg("查找失败");
+        }
         return ServerResponse.createBySuccess("查找成功", list);
     }
 
     public ServerResponse<List<Comment>> getCommentByNoteId(int noteId) {
         List<Comment> list = commentMapper.selectCommentByNoteId(noteId);
+        if(list == null) {
+            return ServerResponse.createByErrorMsg("查找失败");
+        }
         return ServerResponse.createBySuccess("查找成功", list);
     }
 
@@ -102,5 +105,47 @@ public class NoteServiceImpl implements INoteService {
     public ServerResponse<TravelNote> getTravelNote(int noteId) {
         TravelNote travelNote =  travelNoteMapper.selectByPrimaryKey(noteId);
         return ServerResponse.createBySuccess("查找成功", travelNote);
+    }
+
+    public ServerResponse<String> deleteNoteComment(Integer noteId) {
+        int resultCount = commentMapper.deleteByNoteId(noteId);
+        if(resultCount == 0){
+            return ServerResponse.createByErrorMsg("删除游记评论失败");
+        }
+        return ServerResponse.createBySuccessMsg("删除游记评论成功");
+    }
+
+    public ServerResponse<String> deleteComment(Integer commentId) {
+        int resultCount = commentMapper.deleteByPrimaryKey(commentId);
+        if(resultCount == 0){
+            return ServerResponse.createByErrorMsg("删除评论失败");
+        }
+        return ServerResponse.createBySuccessMsg("删除评论成功");
+    }
+
+    public ServerResponse<String> deleteNoteImage(Integer noteId) {
+        int resultCount = noteImageMapper.deleteByNoteId(noteId);
+        if(resultCount == 0){
+            return ServerResponse.createByErrorMsg("删除游记图片失败");
+        }
+        return ServerResponse.createBySuccessMsg("删除游记图片成功");
+    }
+
+    public ServerResponse<String> deleteImage(Integer imageId) {
+        int resultCount = noteImageMapper.deleteByPrimaryKey(imageId);
+        if(resultCount == 0){
+            return ServerResponse.createByErrorMsg("删除图片失败");
+        }
+        return ServerResponse.createBySuccessMsg("删除图片成功");
+    }
+
+    public ServerResponse<String> deleteTravelNote(Integer noteId) {
+        int resultCount1 = travelNoteMapper.deleteByPrimaryKey(noteId);
+        int resultCount2 = commentMapper.deleteByNoteId(noteId);
+        int resultCount3 = noteImageMapper.deleteByNoteId(noteId);
+        if(resultCount1 == 0){
+            return ServerResponse.createByErrorMsg("删除游记失败");
+        }
+        return ServerResponse.createBySuccessMsg("删除游记成功");
     }
 }

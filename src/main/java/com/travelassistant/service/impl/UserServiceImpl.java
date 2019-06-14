@@ -42,7 +42,7 @@ public class UserServiceImpl implements IUserService {
 
         user.setPassword(org.apache.commons.lang3.StringUtils.EMPTY);
         String token = GuidUtil.GenerateGUID();
-        UserWithToken userWithToken = new UserWithToken(user.getId(),user.getPhone(),user.getUsername(),user.getPassword(),user.getCreateTime(),
+        UserWithToken userWithToken = new UserWithToken(user.getId(),user.getPhone(),user.getUsername(),user.getPassword(),user.getRole(),user.getCreateTime(),
                 user.getUpdateTime(),token);
         return ServerResponse.createBySuccess("登录成功",userWithToken);
     }

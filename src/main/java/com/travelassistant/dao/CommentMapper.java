@@ -23,4 +23,6 @@ public interface CommentMapper {
     List<Comment> selectCommentByUsername(@Param("username") String username);
 
     int updateUsername(@Param("newName")String newName, @Param("oldName")String oldName);
+
+    int deleteByNoteId(@Param("noteId")Integer noteId);
 }

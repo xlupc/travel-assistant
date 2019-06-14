@@ -107,7 +107,7 @@ public class UserController {
         if(user == null){
             return ServerResponse.createByErrorMsg("用户未登录");
         }
-        User user1 = new User(user.getId(),user.getPhone(),user.getUsername(),user.getPassword(),user.getCreateTime(),
+        User user1 = new User(user.getId(),user.getPhone(),user.getUsername(),user.getPassword(),user.getRole(),user.getCreateTime(),
                 user.getUpdateTime());
         return iUserService.resetPassword(passwordOld,passwordNew,user1);
     }
@@ -128,7 +128,7 @@ public class UserController {
         if(response.isSuccess()){
             response.getData().setPhone(currentUser.getPhone());
             UserWithToken userWithToken = new UserWithToken(response.getData().getId(),response.getData().getPhone(),response.getData().getUsername(),
-                    response.getData().getPassword(),response.getData().getCreateTime(),
+                    response.getData().getPassword(),response.getData().getRole(),response.getData().getCreateTime(),
                     response.getData().getUpdateTime(),currentUser.getToken());
             session.setAttribute(Const.CURRENT_USER,userWithToken);
         }

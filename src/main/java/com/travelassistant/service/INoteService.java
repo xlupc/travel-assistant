@@ -33,4 +33,14 @@ public interface INoteService {
     ServerResponse<List<Comment>> getComment(int noteId);
 
     ServerResponse<TravelNote> getTravelNote(int noteId);
+
+    ServerResponse<String> deleteNoteComment(Integer noteId);
+
+    ServerResponse<String> deleteComment(Integer commentId);
+
+    ServerResponse<String> deleteNoteImage(Integer noteId);
+
+    ServerResponse<String> deleteImage(Integer imageId);
+
+    ServerResponse<String> deleteTravelNote(Integer noteId);
 }

@@ -7,12 +7,13 @@
       <arg column="phone" jdbcType="VARCHAR" javaType="java.lang.String" />
       <arg column="username" jdbcType="VARCHAR" javaType="java.lang.String" />
       <arg column="password" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="role" jdbcType="INTEGER" javaType="java.lang.Integer" />
       <arg column="create_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
       <arg column="update_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
     </constructor>
   </resultMap>
   <sql id="Base_Column_List" >
-    id, phone, username, password, create_time, update_time
+    id, phone, username, password, role, create_time, update_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select
@@ -26,10 +27,10 @@
   </delete>
   <insert id="insert" parameterType="com.travelassistant.pojo.User" >
     insert into user (id, phone, username,
-    password, create_time, update_time
+    password, role, create_time, update_time
     )
     values (#{id,jdbcType=INTEGER}, #{phone,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR},
-    #{password,jdbcType=VARCHAR}, now(), now()
+    #{password,jdbcType=VARCHAR}, 0, now(), now()
     )
   </insert>
   <insert id="insertSelective" parameterType="com.travelassistant.pojo.User" >
@@ -46,6 +47,9 @@
       </if>
       <if test="password != null" >
         password,
+      </if>
+      <if test="role != null" >
+        role,
       </if>
       <if test="createTime != null" >
         create_time,
@@ -67,6 +71,9 @@
       <if test="password != null" >
         #{password,jdbcType=VARCHAR},
       </if>
+      <if test="role != null" >
+        0,
+      </if>
       <if test="createTime != null" >
         now(),
       </if>
@@ -87,6 +94,9 @@
       <if test="password != null" >
         password = #{password,jdbcType=VARCHAR},
       </if>
+      <if test="role != null" >
+        role = #{role,jdbcType=INTEGER},
+      </if>
       <if test="createTime != null" >
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
@@ -101,6 +111,7 @@
     set phone = #{phone,jdbcType=VARCHAR},
     username = #{username,jdbcType=VARCHAR},
     password = #{password,jdbcType=VARCHAR},
+    role = role,
     create_time = create_time,
     update_time = now()
     where id = #{id,jdbcType=INTEGER}
